@@ -5,6 +5,15 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Code matching</h1>
+
+    <form method="post" asp-page-handler="CodeMatcher">
+        <div class="form">
+            <h2>Door generated code:</h2>
+            <input type="text" id="doorGeneratedCode" name="doorGeneratedCode" required />
+        </div>
+        <button id="evaluate" type="submit">Evaluate</button>
+    </form>
+
+
 </div>

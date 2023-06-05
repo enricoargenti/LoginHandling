@@ -16,3 +16,36 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.form {
+    margin-top: 10%;
+}
+
+#doorGeneratedCode {
+    width: 30%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    outline: none;
+}
+
+    #doorGeneratedCode:focus {
+        background-color: lightblue;
+    }
+
+
+#evaluate {
+    width: 30%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    outline: none;
+}
+
+    #evaluate:hover {
+        background-color: #008CBA;
+        color: white;
+    }
