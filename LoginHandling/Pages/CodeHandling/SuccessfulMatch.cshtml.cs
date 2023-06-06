@@ -1,31 +1,23 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Azure.Devices;
 using System.Text;
-using LoginHandling.Services;
 
-namespace LoginHandling.Pages;
+namespace LoginHandling.Pages.CodeHandling;
 
+[Authorize]
 public class SuccessfulMatchModel : PageModel
 {
     public string RandomAckCode { get; private set; }
-    
+
     // Fields useful for cloud to device messages
     static ServiceClient serviceClient;
     static string connectionString = "HostName=Pi-Cloud.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=sx1De7uIm+lA/4E1olGyS1tvJjpKt/vzlDbfOs5eqHY=";
     static string targetDevice = "Device1";
 
-    // Fields useful to check if the code is on the queue on the IoT Hub
-    QueueListener queueListener;
-    public string ReceivedCode { get; private set; }
-
     public void OnGet()
     {
-        // Check if the code is on the queue
-        queueListener = new QueueListener();
-        queueListener.ListenQueue().Wait();
-        ReceivedCode = queueListener.ReceivedMessage;
-
         // Random code generation
         Random random = new Random();
         for (int i = 0; i < 5; i++)
@@ -37,16 +29,12 @@ public class SuccessfulMatchModel : PageModel
         Console.WriteLine("Send Cloud-to-Device message\n");
         serviceClient = ServiceClient.CreateFromConnectionString(connectionString);
 
-        //Console.WriteLine("Press any key to send a C2D message.");
-        //Console.ReadLine();
         SendCloudToDeviceMessageAsync(RandomAckCode).Wait();
-        //Console.ReadLine();
     }
 
     private async static Task SendCloudToDeviceMessageAsync(string code)
     {
-        var commandMessage = new
-         Message(Encoding.ASCII.GetBytes("Random ack code: " + code));
+        var commandMessage = new Message(Encoding.ASCII.GetBytes("Random ack code: " + code));
         await serviceClient.SendAsync(targetDevice, commandMessage);
     }
 }
