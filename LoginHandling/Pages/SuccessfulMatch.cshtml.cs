@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Azure.Devices;
 using System.Text;
+using LoginHandling.Services;
 
 namespace LoginHandling.Pages;
 
@@ -14,8 +15,17 @@ public class SuccessfulMatchModel : PageModel
     static string connectionString = "HostName=Pi-Cloud.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=sx1De7uIm+lA/4E1olGyS1tvJjpKt/vzlDbfOs5eqHY=";
     static string targetDevice = "Device1";
 
+    // Fields useful to check if the code is on the queue on the IoT Hub
+    QueueListener queueListener;
+    public string ReceivedCode { get; private set; }
+
     public void OnGet()
     {
+        // Check if the code is on the queue
+        queueListener = new QueueListener();
+        queueListener.ListenQueue().Wait();
+        ReceivedCode = queueListener.ReceivedMessage;
+
         // Random code generation
         Random random = new Random();
         for (int i = 0; i < 5; i++)
