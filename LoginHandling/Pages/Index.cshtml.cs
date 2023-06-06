@@ -14,6 +14,7 @@ public class IndexModel : PageModel
     // Fields useful to check if the code is on the queue on the IoT Hub
     QueueListener queueListener;
     public string _deviceSentCode { get; private set; }
+    public string _deviceId { get; private set; }
 
     public IndexModel(ILogger<IndexModel> logger)
     {
@@ -36,21 +37,22 @@ public class IndexModel : PageModel
         queueListener = new QueueListener();
         queueListener.ListenQueue().Wait();
         _deviceSentCode = queueListener.ReceivedMessage;
+        _deviceId = queueListener.DeviceId;
 
         if(_deviceSentCode == "no-message")
         {
-            return RedirectToPage("NoMessageAvailable");
+            return RedirectToPage("/CodeHandling/NoMessageAvailable", new { DeviceId = _deviceId });
         }
 
         if (_userInsertedCode == _deviceSentCode)
         {
             // Redirect to another page on successful match
-            return RedirectToPage("/CodeHandling/SuccessfulMatch");
+            return RedirectToPage("/CodeHandling/SuccessfulMatch", new { DeviceId = _deviceId });
         }
         else
         {
             // Redirect to another page also on failed match
-            return RedirectToPage("/CodeHandling/FailedMatch");
+            return RedirectToPage("/CodeHandling/FailedMatch", new { DeviceId = _deviceId });
         }
     }
 

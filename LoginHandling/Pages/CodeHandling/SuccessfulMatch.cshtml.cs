@@ -15,9 +15,10 @@ public class SuccessfulMatchModel : PageModel
     // Fields useful for cloud to device messages
     static ServiceClient serviceClient;
     static string connectionString = "HostName=Pi-Cloud.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=sx1De7uIm+lA/4E1olGyS1tvJjpKt/vzlDbfOs5eqHY=";
-    static string targetDevice = "Device1";
+    public string DeviceId { get; private set; }
+    static string targetDevice;
 
-    public void OnGet()
+    public void OnGet(string deviceId)
     {
         // Random code generation
         Random random = new Random();
@@ -37,6 +38,11 @@ public class SuccessfulMatchModel : PageModel
 
 
         // Random code sending to the device
+
+        // Get the device ID
+        DeviceId = deviceId;
+        targetDevice = deviceId;
+
         Console.WriteLine("Send Cloud-to-Device message\n");
         serviceClient = ServiceClient.CreateFromConnectionString(connectionString);
 

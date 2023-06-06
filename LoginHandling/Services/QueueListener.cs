@@ -16,6 +16,8 @@ public class QueueListener
 
     public string ReceivedMessage;
 
+    public string DeviceId;
+
     public QueueListener()
     {
         client = new ServiceBusClient(__serviceBusConnString);
@@ -28,6 +30,10 @@ public class QueueListener
         {
             // the received message is a different type as it contains some service set properties
             ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync();
+
+            // Check the device-specific property
+            DeviceId = receivedMessage.ApplicationProperties["DeviceId"].ToString();
+            Console.WriteLine(DeviceId);
 
             // get the message body as a string
             string body = receivedMessage.Body.ToString();

@@ -3,10 +3,16 @@
 @{
 }
 
-<div class="alert alert-success">
-    <strong>Success!</strong> You can now open the door using the following code
-</div>
+<div class="text-center">
+    <div class="alert alert-success">
+        <strong>Success!</strong> You can now open the door using the following code
+    </div>
 
-<div>
-    <p>Code: @HttpContext.Session.GetString("_RandomAckCode")</p><br />
+    <div id="randomAckCode">
+        <p>Code: @HttpContext.Session.GetString("_RandomAckCode")</p><br />
+    </div>
+
+    <div id="deviceId">
+        <p>DeviceId: @Model.DeviceId</p><br />
+    </div>
 </div>

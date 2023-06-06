@@ -49,3 +49,26 @@ body {
         background-color: #008CBA;
         color: white;
     }
+
+#randomAckCode {
+    width: 30%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    outline: none;
+    background-color: lightgreen;
+    text-align: center;
+}
+
+#deviceId {
+    width: 30%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    outline: none;
+    background-color: lightblue;
+    margin-top: 3%;
+    text-align: center;
+}
