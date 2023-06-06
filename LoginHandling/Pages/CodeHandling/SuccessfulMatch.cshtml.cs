@@ -10,6 +10,7 @@ namespace LoginHandling.Pages.CodeHandling;
 public class SuccessfulMatchModel : PageModel
 {
     public string RandomAckCode { get; private set; }
+    public const string SessionKeyRandomAckCode = "_RandomAckCode";
 
     // Fields useful for cloud to device messages
     static ServiceClient serviceClient;
@@ -22,8 +23,18 @@ public class SuccessfulMatchModel : PageModel
         Random random = new Random();
         for (int i = 0; i < 5; i++)
         {
-            RandomAckCode += random.Next(1, 10).ToString(); // Generate a random number between 1 and 9
+            // Generate a random number between 1 and 9
+            RandomAckCode += random.Next(1, 10).ToString();
         }
+
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyRandomAckCode)))
+        {
+            // Store the code in the user's session (so that even if the page
+            // is refreshed, the code will remain the same)
+            HttpContext.Session.SetString(SessionKeyRandomAckCode, RandomAckCode);
+        }
+        RandomAckCode = HttpContext.Session.GetString(SessionKeyRandomAckCode);
+
 
         // Random code sending to the device
         Console.WriteLine("Send Cloud-to-Device message\n");

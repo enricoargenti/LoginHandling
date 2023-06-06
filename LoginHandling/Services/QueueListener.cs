@@ -24,14 +24,30 @@ public class QueueListener
 
     public async Task ListenQueue()
     {
+        try
+        {
+            // the received message is a different type as it contains some service set properties
+            ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync();
 
-        // the received message is a different type as it contains some service set properties
-        ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync();
+            // get the message body as a string
+            string body = receivedMessage.Body.ToString();
+            Console.WriteLine(body);
 
-        // get the message body as a string
-        string body = receivedMessage.Body.ToString();
-        Console.WriteLine(body);
+            ReceivedMessage = body;
 
-        ReceivedMessage = body;
+            // Complete the message to remove it from the queue
+            await receiver.CompleteMessageAsync(receivedMessage);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            ReceivedMessage = "no-message";
+        }
+        finally
+        {
+
+        }
+
     }
+
 }

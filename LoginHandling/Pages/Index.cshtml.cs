@@ -37,6 +37,11 @@ public class IndexModel : PageModel
         queueListener.ListenQueue().Wait();
         _deviceSentCode = queueListener.ReceivedMessage;
 
+        if(_deviceSentCode == "no-message")
+        {
+            return RedirectToPage("NoMessageAvailable");
+        }
+
         if (_userInsertedCode == _deviceSentCode)
         {
             // Redirect to another page on successful match

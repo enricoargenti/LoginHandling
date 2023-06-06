@@ -8,5 +8,5 @@
 </div>
 
 <div>
-    <p>Code: @Model.RandomAckCode</p><br />
+    <p>Code: @HttpContext.Session.GetString("_RandomAckCode")</p><br />
 </div>
