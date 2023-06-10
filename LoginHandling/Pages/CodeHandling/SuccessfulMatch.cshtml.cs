@@ -1,8 +1,10 @@
+using LoginHandling.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Azure.Devices;
 using System.Text;
+using System.Text.Json;
 
 namespace LoginHandling.Pages.CodeHandling;
 
@@ -15,10 +17,10 @@ public class SuccessfulMatchModel : PageModel
     // Fields useful for cloud to device messages
     static ServiceClient serviceClient;
     static string connectionString = "HostName=Pi-Cloud.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=sx1De7uIm+lA/4E1olGyS1tvJjpKt/vzlDbfOs5eqHY=";
-    public string DeviceId { get; private set; }
+    public Packet Packet { get; private set; }
     static string targetDevice;
 
-    public void OnGet(string deviceId)
+    public void OnGet(string jsonMessageFromDevice)
     {
         // Random code generation
         Random random = new Random();
@@ -39,9 +41,10 @@ public class SuccessfulMatchModel : PageModel
 
         // Random code sending to the device
 
-        // Get the device ID
-        DeviceId = deviceId;
-        targetDevice = deviceId;
+        // Get the device information
+        Packet? message = JsonSerializer.Deserialize<Packet>(jsonMessageFromDevice);
+        Packet = message;
+        targetDevice = message.DeviceID;
 
         Console.WriteLine("Send Cloud-to-Device message\n");
         serviceClient = ServiceClient.CreateFromConnectionString(connectionString);

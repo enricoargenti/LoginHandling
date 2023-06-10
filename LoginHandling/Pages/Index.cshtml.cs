@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using LoginHandling.Services;
+using System.Text.Json;
+using LoginHandling.Models;
+using Microsoft.Azure.Devices;
 
 namespace LoginHandling.Pages;
 
@@ -14,7 +17,7 @@ public class IndexModel : PageModel
     // Fields useful to check if the code is on the queue on the IoT Hub
     QueueListener queueListener;
     public string _deviceSentCode { get; private set; }
-    public string _deviceId { get; private set; }
+    public string _jsonMessageFromDevice { get; private set; }
 
     public IndexModel(ILogger<IndexModel> logger)
     {
@@ -36,23 +39,28 @@ public class IndexModel : PageModel
         // Check if the code is on the queue
         queueListener = new QueueListener();
         queueListener.ListenQueue().Wait();
-        _deviceSentCode = queueListener.ReceivedMessage;
-        _deviceId = queueListener.DeviceId;
+        Packet? message = JsonSerializer.Deserialize<Packet>(queueListener.ReceivedMessage);
+        _deviceSentCode = message.DeviceGeneratedCode;
+        _jsonMessageFromDevice = queueListener.ReceivedMessage;
+
+        Console.WriteLine("In Login: " + _jsonMessageFromDevice.ToString());
 
         if(_deviceSentCode == "no-message")
         {
-            return RedirectToPage("/CodeHandling/NoMessageAvailable", new { DeviceId = _deviceId });
+            return RedirectToPage("/CodeHandling/NoMessageAvailable", new { jsonMessageFromDevice = _jsonMessageFromDevice });
         }
 
+        // Ma qui devo mettere un while (_userInsertedCode == _deviceSentCode) ciclando su tutti i messaggi della coda.
+        // Se alla fine nessuna corrispondenza è stata trovata, mando in failedMatch
         if (_userInsertedCode == _deviceSentCode)
         {
             // Redirect to another page on successful match
-            return RedirectToPage("/CodeHandling/SuccessfulMatch", new { DeviceId = _deviceId });
+            return RedirectToPage("/CodeHandling/SuccessfulMatch", new { jsonMessageFromDevice = _jsonMessageFromDevice });
         }
         else
         {
             // Redirect to another page also on failed match
-            return RedirectToPage("/CodeHandling/FailedMatch", new { DeviceId = _deviceId });
+            return RedirectToPage("/CodeHandling/FailedMatch", new { jsonMessageFromDevice = _jsonMessageFromDevice });
         }
     }
 

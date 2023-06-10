@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using LoginHandling.Models;
 using System.Threading.Tasks;
 
 namespace LoginHandling.Services;
@@ -16,8 +17,6 @@ public class QueueListener
 
     public string ReceivedMessage;
 
-    public string DeviceId;
-
     public QueueListener()
     {
         client = new ServiceBusClient(__serviceBusConnString);
@@ -32,14 +31,13 @@ public class QueueListener
             ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync();
 
             // Check the device-specific property
-            DeviceId = receivedMessage.ApplicationProperties["DeviceId"].ToString();
-            Console.WriteLine(DeviceId);
+            //DeviceId = receivedMessage.ApplicationProperties["DeviceId"].ToString();
+            //Console.WriteLine(DeviceId);
 
-            // get the message body as a string
-            string body = receivedMessage.Body.ToString();
-            Console.WriteLine(body);
+            // get the message body as a json string
+            var messageJSON = receivedMessage.Body;
 
-            ReceivedMessage = body;
+            ReceivedMessage = messageJSON.ToString();
 
             // Complete the message to remove it from the queue
             await receiver.CompleteMessageAsync(receivedMessage);
