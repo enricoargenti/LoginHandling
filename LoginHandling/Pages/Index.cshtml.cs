@@ -43,7 +43,7 @@ public class IndexModel : PageModel
         bool vediamo = _userInsertedCode.Equals(_deviceSentCode);
         Console.WriteLine("Valore boolean odel confronto: " + vediamo);
 
-        if (_userInsertedCode.Equals(_deviceSentCode))
+        if (_userInsertedCode.Equals(_deviceSentCode))  // ADD ALSO THE CONTROL ON THE DATETIME!
         {
             // Redirect to another page on successful match
             string jsonOpenDoorRequest = JsonSerializer.Serialize(_openDoorRequest);

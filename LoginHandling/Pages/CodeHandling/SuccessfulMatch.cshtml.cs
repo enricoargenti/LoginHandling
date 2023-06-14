@@ -28,16 +28,24 @@ public class SuccessfulMatchModel : PageModel
         }
         _openDoorRequest = JsonSerializer.Deserialize<OpenDoorRequest>(jsonOpenDoorRequest);
 
+        Console.WriteLine("CloudGeneratedCode that should be printed" + _openDoorRequest.CloudGeneratedCode);
+
         // To expose the code on the UI
         CloudGeneratedCode = _openDoorRequest.CloudGeneratedCode;
 
         // Get the device information
-        targetDevice = _openDoorRequest.GatewayId.ToString();
+        // Here a query has to be done to retrieve the Gateway.DeviceId that matches this Gateway.Id
+        targetDevice = _openDoorRequest.DeviceId;
+        Console.WriteLine("Target device id: " + targetDevice);
 
         Console.WriteLine("Send Cloud-to-Device message\n");
         serviceClient = ServiceClient.CreateFromConnectionString(connectionString);
 
         //SendCloudToDeviceMessageAsync(_openDoorRequest.CloudGeneratedCode.ToString()).Wait();
+
+        // Dopo averlo mandato, dovrò aspettare qui in await per la risposta da parte del PIC 
+        // (altrimenti ogni volte che lo user clicca "refresh page" il messaggio viene inviato
+        // di nuovo al device
     }
 
     private async static Task SendCloudToDeviceMessageAsync(string code)
