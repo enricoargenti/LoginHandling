@@ -11,8 +11,8 @@ namespace LoginHandling.Pages.CodeHandling;
 [Authorize]
 public class SuccessfulMatchModel : PageModel
 {
-    public string RandomAckCode { get; private set; }
-    public const string SessionKeyRandomAckCode = "_RandomAckCode";
+    private OpenDoorRequest _openDoorRequest;
+    public int CloudGeneratedCode { get; set; }
 
     // Fields useful for cloud to device messages
     static ServiceClient serviceClient;
@@ -20,36 +20,24 @@ public class SuccessfulMatchModel : PageModel
     public Packet Packet { get; private set; }
     static string targetDevice;
 
-    public void OnGet(string jsonMessageFromDevice)
+    public void OnGet(string jsonOpenDoorRequest)
     {
-        // Random code generation
-        Random random = new Random();
-        for (int i = 0; i < 5; i++)
+        if (jsonOpenDoorRequest is null)
         {
-            // Generate a random number between 1 and 9
-            RandomAckCode += random.Next(1, 10).ToString();
+            throw new ArgumentNullException(nameof(jsonOpenDoorRequest));
         }
+        _openDoorRequest = JsonSerializer.Deserialize<OpenDoorRequest>(jsonOpenDoorRequest);
 
-        if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyRandomAckCode)))
-        {
-            // Store the code in the user's session (so that even if the page
-            // is refreshed, the code will remain the same)
-            HttpContext.Session.SetString(SessionKeyRandomAckCode, RandomAckCode);
-        }
-        RandomAckCode = HttpContext.Session.GetString(SessionKeyRandomAckCode);
-
-
-        // Random code sending to the device
+        // To expose the code on the UI
+        CloudGeneratedCode = _openDoorRequest.CloudGeneratedCode;
 
         // Get the device information
-        Packet? message = JsonSerializer.Deserialize<Packet>(jsonMessageFromDevice);
-        Packet = message;
-        targetDevice = message.DeviceID;
+        targetDevice = _openDoorRequest.GatewayId.ToString();
 
         Console.WriteLine("Send Cloud-to-Device message\n");
         serviceClient = ServiceClient.CreateFromConnectionString(connectionString);
 
-        SendCloudToDeviceMessageAsync(RandomAckCode).Wait();
+        //SendCloudToDeviceMessageAsync(_openDoorRequest.CloudGeneratedCode.ToString()).Wait();
     }
 
     private async static Task SendCloudToDeviceMessageAsync(string code)
