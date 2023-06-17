@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace LoginHandling.Pages.CodeHandling
 {
-    public class NoMessageAvailableModel : PageModel
+    public class CodeExpiredModel : PageModel
     {
         public void OnGet()
         {

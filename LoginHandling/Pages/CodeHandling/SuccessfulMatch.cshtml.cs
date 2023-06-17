@@ -12,7 +12,7 @@ namespace LoginHandling.Pages.CodeHandling;
 public class SuccessfulMatchModel : PageModel
 {
     private OpenDoorRequest _openDoorRequest;
-    public int CloudGeneratedCode { get; set; }
+    public string CloudGeneratedCode { get; set; }
 
     // Fields useful for cloud to device messages
     static ServiceClient serviceClient;

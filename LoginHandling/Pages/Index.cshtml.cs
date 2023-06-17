@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;
 using LoginHandling.Models;
 using System.Net.Http.Headers;
+using System;
 
 namespace LoginHandling.Pages;
 
@@ -12,7 +13,7 @@ public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     private string _userInsertedCode { get; set; }
-    public string _deviceSentCode { get; set; }
+    public string deviceSentCode { get; set; }
 
     private OpenDoorRequest _openDoorRequest { get; set; }
 
@@ -38,21 +39,37 @@ public class IndexModel : PageModel
         // Ma qui devo mettere un while (_userInsertedCode == _deviceSentCode) ciclando su tutti i messaggi della coda.
         // Se alla fine nessuna corrispondenza è stata trovata, mando in failedMatch
 
-        Console.WriteLine($"Convertito a stringa: {_deviceSentCode}");
+        Console.WriteLine($"Convertito a stringa: {deviceSentCode}");
         Console.WriteLine($"Codice inserito dall'utente: {_userInsertedCode}");
-        bool vediamo = _userInsertedCode.Equals(_deviceSentCode);
+        bool vediamo = _userInsertedCode.Equals(deviceSentCode);
         Console.WriteLine("Valore boolean odel confronto: " + vediamo);
 
-        if (_userInsertedCode.Equals(_deviceSentCode))  // ADD ALSO THE CONTROL ON THE DATETIME!
+
+        if (_userInsertedCode.Equals(deviceSentCode))  // ADD ALSO THE CONTROL ON THE DATETIME!
         {
-            // Redirect to another page on successful match
-            string jsonOpenDoorRequest = JsonSerializer.Serialize(_openDoorRequest);
-            return RedirectToPage("/CodeHandling/SuccessfulMatch", new { jsonOpenDoorRequest = jsonOpenDoorRequest });
+            // Control that the token is still valid
+            TimeSpan difference = _openDoorRequest.AccessRequestTime.Subtract(DateTime.Now);
+            TimeSpan threeMinutes = TimeSpan.FromMinutes(3);
+            Console.WriteLine("Difference: " + difference);
+            Console.WriteLine("Three minutes: " + threeMinutes);
+
+            if (difference > threeMinutes)
+            {
+                Console.WriteLine("Error: the code is not valid anymore");
+                // Redirect to another page
+                return RedirectToPage("/CodeHandling/CodeExpired");
+            }
+            else
+            {
+                // Redirect to another page on successful match
+                string jsonOpenDoorRequest = JsonSerializer.Serialize(_openDoorRequest);
+                return RedirectToPage("/CodeHandling/SuccessfulMatch", new { jsonOpenDoorRequest = jsonOpenDoorRequest });
+            }
 
         }
         else
         {
-            // Redirect to another page also on failed match
+            // Redirect to another page on failed match
             return RedirectToPage("/CodeHandling/FailedMatch");
         }
     }
@@ -64,20 +81,20 @@ public class IndexModel : PageModel
 
         try
         {
-            int code = Convert.ToInt32(_userInsertedCode);
 
-            string path = $"api/DoorOpenRequest/deviceGeneratedCode/{code}";
+            string path = $"api/DoorOpenRequest/deviceGeneratedCode/{_userInsertedCode}";
 
             _openDoorRequest = await GetOpenDoorRequestAsync(path);
 
             if (_openDoorRequest != null)
             {
                 Console.WriteLine($"OpenDoorRequest found: {_openDoorRequest.Id}");
-                _deviceSentCode = _openDoorRequest.DeviceGeneratedCode.ToString();
+                deviceSentCode = _openDoorRequest.DeviceGeneratedCode;
             }
             else
             {
                 Console.WriteLine("OpenDoorRequest not found.");
+                deviceSentCode = null;
             }
         }
         catch (Exception ex)
