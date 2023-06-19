@@ -7,6 +7,9 @@ using System.Net.Http.Headers;
 using System;
 using Microsoft.AspNetCore.Identity;
 using DbAccessApplication.Models;
+using System.Net.Http;
+using Microsoft.Azure.Amqp.Framing;
+using System.Text;
 
 namespace LoginHandling.Pages;
 
@@ -61,7 +64,7 @@ public class IndexModel : PageModel
         Console.WriteLine("Valore boolean odel confronto: " + vediamo);
 
 
-        if (_userInsertedCode.Equals(DeviceSentCode))  // ADD ALSO THE CONTROL ON THE DATETIME!
+        if (_userInsertedCode.Equals(DeviceSentCode))
         {
             // The first control is on the permission given to the current user to access the building
 
@@ -71,6 +74,9 @@ public class IndexModel : PageModel
             if(_hasPermissions)
             {
                 Console.WriteLine($"The user {_userPermissions.UserName} has permissions to get inside");
+                // Set the user inside the table openDoorRequests
+                _openDoorRequest.UserId = _userPermissions.UserId;
+                await SetUserIdOnRequest();
             }
             else
             {
@@ -174,6 +180,26 @@ public async Task GetUserPermissions()
     }
 }
 
+    //SetUserIdOnRequest
+public async Task SetUserIdOnRequest()
+{
+    try
+    {
+        string path = $"api/DoorOpenRequest/{_openDoorRequest.Id}";
+        Console.WriteLine("Path della PUT: " + path);
+
+        // Serialize the object or JSON data to a string
+        //string content = JsonSerializer.Serialize(_openDoorRequest);
+
+        await UpdateOpenDoorRequestAsync(path, _openDoorRequest);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred: {ex.Message}");
+    }
+}
+
+
 
     static async Task<OpenDoorRequest> GetOpenDoorRequestAsync(string path)
     {
@@ -208,6 +234,26 @@ public async Task GetUserPermissions()
             userPermissions = await response.Content.ReadAsAsync<UserPermissions>();
         }
         return userPermissions;
+    }
+
+    static async Task UpdateOpenDoorRequestAsync(string path, OpenDoorRequest content)
+    {
+        HttpResponseMessage response = await _client.PutAsJsonAsync(path, content);
+
+        Console.WriteLine();
+        Console.WriteLine("content: " + JsonSerializer.Serialize(content));
+
+        Console.WriteLine("Response della PUT: " +  response.StatusCode);
+        Console.WriteLine(response.ToString());
+        Console.WriteLine(response.RequestMessage);
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("OpenDoorRequest successfully updated");
+        }
+        else
+        {
+            Console.WriteLine("Failed OpenDoorRequest update");
+        }
     }
 
 }
