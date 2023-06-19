@@ -12,5 +12,21 @@
         <p>Code: @Model.CloudGeneratedCode</p><br />
     </div>
 
+    @if (@Model.CodeInsertedOnDoorByUser != null)
+    {
+        @if (@Model.CloudGeneratedCode == @Model.CodeInsertedOnDoorByUser)
+        {
+            <div class="alert alert-success">
+                <strong>Good!</strong> The code you inserted was correct.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-dark">
+                <strong>Ops!</strong> It seems the code you provided was not correct.
+            </div>
+        }
+    }
+
 
 </div>

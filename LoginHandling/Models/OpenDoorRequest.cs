@@ -13,6 +13,7 @@ internal class OpenDoorRequest
     public string DeviceId { get; set; }
     public string DeviceGeneratedCode { get; set; }
     public string CloudGeneratedCode { get; set; }
+    public string? CodeInsertedOnDoorByUser { get; set; }
     public DateTime AccessRequestTime { get; set; }
     public string? UserId { get; set; }
 

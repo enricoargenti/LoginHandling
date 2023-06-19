@@ -142,62 +142,58 @@ public class IndexModel : PageModel
         }
     }
 
-public async Task DeleteCode()
-{
-    try
+    public async Task DeleteCode()
     {
-        string path = $"api/DoorOpenRequest/{_openDoorRequest.Id}";
-        await DeleteOpenDoorRequestAsync(path);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"An error occurred: {ex.Message}");
-    }
-}
-
-public async Task GetUserPermissions()
-{
-    try
-    {
-        string path = $"api/DoorOpenRequest/user/{_currentUserId}/deviceId/{_openDoorRequest.DeviceId}";
-        Console.WriteLine("path to get permissions: " + path);
-
-        _userPermissions = await GetUserPermissionsAsync(path);
-        Console.WriteLine("_userPermissions: " + _userPermissions);
-
-        if (_userPermissions != null)
+        try
         {
-            _hasPermissions = true;
+            string path = $"api/DoorOpenRequest/{_openDoorRequest.Id}";
+            await DeleteOpenDoorRequestAsync(path);
         }
-        else
+        catch (Exception ex)
         {
-            _hasPermissions = false;
+            Console.WriteLine($"An error occurred: {ex.Message}");
         }
     }
-    catch (Exception ex)
+
+    public async Task GetUserPermissions()
     {
-        Console.WriteLine($"An error occurred: {ex.Message}");
+        try
+        {
+            string path = $"api/DoorOpenRequest/user/{_currentUserId}/deviceId/{_openDoorRequest.DeviceId}";
+            Console.WriteLine("path to get permissions: " + path);
+
+            _userPermissions = await GetUserPermissionsAsync(path);
+            Console.WriteLine("_userPermissions: " + _userPermissions);
+
+            if (_userPermissions != null)
+            {
+                _hasPermissions = true;
+            }
+            else
+            {
+                _hasPermissions = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
-}
 
     //SetUserIdOnRequest
-public async Task SetUserIdOnRequest()
-{
-    try
+    public async Task SetUserIdOnRequest()
     {
-        string path = $"api/DoorOpenRequest/{_openDoorRequest.Id}";
-        Console.WriteLine("Path della PUT: " + path);
+        try
+        {
+            string path = $"api/DoorOpenRequest/{_openDoorRequest.Id}";
 
-        // Serialize the object or JSON data to a string
-        //string content = JsonSerializer.Serialize(_openDoorRequest);
-
-        await UpdateOpenDoorRequestAsync(path, _openDoorRequest);
+            await UpdateOpenDoorRequestAsync(path, _openDoorRequest);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"An error occurred: {ex.Message}");
-    }
-}
 
 
 
@@ -242,6 +238,7 @@ public async Task SetUserIdOnRequest()
 
         Console.WriteLine();
         Console.WriteLine("content: " + JsonSerializer.Serialize(content));
+        Console.WriteLine("path: " + path);
 
         Console.WriteLine("Response della PUT: " +  response.StatusCode);
         Console.WriteLine(response.ToString());
