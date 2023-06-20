@@ -6,3 +6,14 @@
 <div class="alert alert-danger">
     <strong>Error</strong> The code you provided is not correct. Do you want to retry?
 </div>
+
+
+<button id="redirectButton" class="btn btn-primary">Yes, let me retry</button>
+
+@section Scripts {
+    <script>
+        document.getElementById('redirectButton').addEventListener('click', function() {
+            window.location.href = '/Index';
+        });
+    </script>
+}

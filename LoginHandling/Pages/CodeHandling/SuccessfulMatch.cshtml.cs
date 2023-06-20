@@ -97,16 +97,33 @@ public class SuccessfulMatchModel : PageModel
                 CodeInsertedOnDoorByUser = response.CodeInsertedOnDoorByUser;
                 // Stop requesting data
                 StopApiCalls();
+
+                CodesMatcher();
             }
         }
         
+    }
+
+    public IActionResult CodesMatcher()
+    {
+        if (CodeInsertedOnDoorByUser == _openDoorRequest.CloudGeneratedCode)
+        {
+            Console.WriteLine("/FinalMatch/SecondMatchSuccessful");
+            // Redirect to another page
+            return RedirectToPage("/Index");
+        }
+        else
+        {
+            Console.WriteLine("/FinalMatch/SecondMatchFailed");
+            // Redirect to another page
+            return RedirectToPage("/FinalMatch/SecondMatchFailed");
+        }
     }
 
     private void StopApiCalls()
     {
         _timer?.Dispose();
         _cancellationTokenSource.Cancel();
-        // Perform any additional cleanup or logic if needed
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
