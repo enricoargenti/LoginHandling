@@ -50,23 +50,23 @@ body {
         color: white;
     }
 
-#randomAckCode {
-    width: 50%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    box-sizing: border-box;
-    outline: none;
-    background-color: lightgreen;
-    text-align: center;
+.container {
+    width: 80%;
+    height: auto;
+    margin: 0 auto;
+    position: relative;
 }
 
-#deviceId {
+#randomAckCode {
     width: 50%;
+    margin-left: auto;
+    margin-right: auto;
     padding: 12px 20px;
     margin: 8px 0;
     box-sizing: border-box;
     outline: none;
-    background-color: lightblue;
-    margin-top: 3%;
+    background-color: rgb(29, 234, 14, 0.50);
     text-align: center;
+    font-size: large;
+    position: absolute;
 }

@@ -1,15 +1,16 @@
 ﻿@page
 @model SuccessfulMatchModel
 @{
+    ViewData["Title"] = "Successful Match";
 }
 
-<div class="text-center">
+<div class="container">
     <div class="alert alert-success">
         <strong>Success!</strong> You can now open the door using the following code
     </div>
 
     <div id="randomAckCode">
-        <p>Code: @Model.CloudGeneratedCode</p><br />
+        <p>@Model.CloudGeneratedCode</p>
     </div>
 
 

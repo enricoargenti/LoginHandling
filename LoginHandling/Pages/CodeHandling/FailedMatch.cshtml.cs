@@ -7,7 +7,9 @@ namespace LoginHandling.Pages.CodeHandling;
 [Authorize]
 public class FailedMatchModel : PageModel
 {
-    public void OnGet()
+    public int AvailableTries { get; set; }
+    public void OnGet(int availableTries)
     {
+        AvailableTries = availableTries;
     }
 }

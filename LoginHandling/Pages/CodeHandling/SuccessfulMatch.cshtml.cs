@@ -22,6 +22,8 @@ public class SuccessfulMatchModel : PageModel
     private Timer _timer;
     private CancellationTokenSource _cancellationTokenSource;
 
+    private bool _matchCanBeTried; 
+
     // Fields useful for cloud to device messages
     //static ServiceClient serviceClient;
     //static string connectionString = "HostName=Pi-Cloud.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=sx1De7uIm+lA/4E1olGyS1tvJjpKt/vzlDbfOs5eqHY=";
@@ -31,6 +33,8 @@ public class SuccessfulMatchModel : PageModel
 
     public void OnGet(string jsonOpenDoorRequest)
     {
+        _matchCanBeTried = false;
+
         if (jsonOpenDoorRequest is null)
         {
             throw new ArgumentNullException(nameof(jsonOpenDoorRequest));
@@ -50,7 +54,6 @@ public class SuccessfulMatchModel : PageModel
 
         _cancellationTokenSource = new CancellationTokenSource();
         _timer = new Timer(DoApiCall, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
 
         // Get the device information
         // Here a query has to be done to retrieve the Gateway.DeviceId that matches this Gateway.Id
@@ -104,13 +107,16 @@ public class SuccessfulMatchModel : PageModel
         
     }
 
-    public IActionResult CodesMatcher()
+    public async Task<IActionResult> CodesMatcher()
     {
         if (CodeInsertedOnDoorByUser == _openDoorRequest.CloudGeneratedCode)
         {
+            // Try to set the log into the db
+            await SetAccess();
+
             Console.WriteLine("/FinalMatch/SecondMatchSuccessful");
             // Redirect to another page
-            return RedirectToPage("/Index");
+            return RedirectToPage("/FinalMatch/SecondMatchSuccessful");
         }
         else
         {
@@ -135,6 +141,34 @@ public class SuccessfulMatchModel : PageModel
         });
 
         base.OnPageHandlerExecuting(context);
+    }
+
+    //Set Access (after all code match)
+    public async Task SetAccess()
+    {
+        // Set the new access
+        Access newAccess = new Access();
+        newAccess.UserId = _openDoorRequest.UserId;
+        newAccess.DoorId = _openDoorRequest.DoorId;
+        newAccess.DeviceId = _openDoorRequest.DeviceId;
+        newAccess.AccessRequestTime = _openDoorRequest.AccessRequestTime;
+
+        string path = $"api/DoorOpenRequest/newaccess";
+
+        HttpResponseMessage response = await _client.PostAsJsonAsync(path, newAccess);
+        try
+        {
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine("response: " + response.ToString());
+        }
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("New access saved into logs table");
+        }
     }
 
     static async Task<OpenDoorRequest> GetOpenDoorRequestAsync(string path)

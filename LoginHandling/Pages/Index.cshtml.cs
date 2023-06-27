@@ -7,9 +7,6 @@ using System.Net.Http.Headers;
 using System;
 using Microsoft.AspNetCore.Identity;
 using DbAccessApplication.Models;
-using System.Net.Http;
-using Microsoft.Azure.Amqp.Framing;
-using System.Text;
 
 namespace LoginHandling.Pages;
 
@@ -28,6 +25,8 @@ public class IndexModel : PageModel
     private UserPermissions _userPermissions { get; set; }
     private bool _hasPermissions { get; set; }
 
+    public int AvailableTries { get; set; }
+
     // Client initialization
     static HttpClient _client;
 
@@ -41,6 +40,9 @@ public class IndexModel : PageModel
         _client.BaseAddress = new Uri("https://localhost:7295/");
         _client.DefaultRequestHeaders.Accept.Clear();
         _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        //Set available tries (3) in case of failed match
+        AvailableTries = 3;
     }
 
     public async Task<IActionResult> OnPostCodeMatcher()
@@ -55,18 +57,15 @@ public class IndexModel : PageModel
 
         // Once we have the code inserited by the user,
         // we have to search for the corresponding code inside the database
-
         await GetCode();
 
         Console.WriteLine($"Convertito a stringa: {DeviceSentCode}");
         Console.WriteLine($"Codice inserito dall'utente: {_userInsertedCode}");
-        bool vediamo = _userInsertedCode.Equals(DeviceSentCode);
-        Console.WriteLine("Valore boolean odel confronto: " + vediamo);
 
 
         if (_userInsertedCode.Equals(DeviceSentCode))
         {
-            // The first control is on the permission given to the current user to access the building
+            // The first control is on permissions given to the current user to access the building
 
             // APIs call to get the user permissions
             await GetUserPermissions();
@@ -81,6 +80,10 @@ public class IndexModel : PageModel
             else
             {
                 Console.WriteLine($"The user has no permission to get inside");
+
+                // APIs call to delete the row (because the user request cannot be processed)
+                //await DeleteCode();
+
                 // Redirect to another page
                 return RedirectToPage("/CodeHandling/NoPermission");
             }
@@ -111,8 +114,10 @@ public class IndexModel : PageModel
         }
         else
         {
+            // This step does not cancel the request until the counter get to three attempts
+            AvailableTries--;
             // Redirect to another page on failed match
-            return RedirectToPage("/CodeHandling/FailedMatch");
+            return RedirectToPage("/CodeHandling/FailedMatch", new { availableTries = AvailableTries });
         }
     }
 
@@ -120,7 +125,6 @@ public class IndexModel : PageModel
     {
         try
         {
-
             string path = $"api/DoorOpenRequest/deviceGeneratedCode/{_userInsertedCode}";
 
             _openDoorRequest = await GetOpenDoorRequestAsync(path);
@@ -236,13 +240,6 @@ public class IndexModel : PageModel
     {
         HttpResponseMessage response = await _client.PutAsJsonAsync(path, content);
 
-        Console.WriteLine();
-        Console.WriteLine("content: " + JsonSerializer.Serialize(content));
-        Console.WriteLine("path: " + path);
-
-        Console.WriteLine("Response della PUT: " +  response.StatusCode);
-        Console.WriteLine(response.ToString());
-        Console.WriteLine(response.RequestMessage);
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("OpenDoorRequest successfully updated");
