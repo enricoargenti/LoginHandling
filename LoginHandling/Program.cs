@@ -1,10 +1,19 @@
 using LoginHandling.Data;
+using LoginHandling.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var apiUrl = builder.Configuration.GetValue<string>("apiUrl");
 
+builder.Services.AddHttpClient("api", client =>
+{
+    client.BaseAddress = new Uri(apiUrl);
+    client.DefaultRequestHeaders.Accept.Clear();
+    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+});
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -25,6 +34,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<ApiProxyService>();
 
 var app = builder.Build();
 

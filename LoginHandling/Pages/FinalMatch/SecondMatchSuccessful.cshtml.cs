@@ -7,6 +7,8 @@ namespace LoginHandling.Pages.FinalMatch
     {
         public void OnGet()
         {
+            // The row has to be deleted from the db
+            // await DeleteCode();
         }
     }
 }

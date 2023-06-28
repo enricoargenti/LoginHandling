@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace LoginHandling.Models;
 
-internal class OpenDoorRequest
+public class OpenDoorRequest
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
     public int DoorId { get; set; }
     public string DeviceId { get; set; }
     public string DeviceGeneratedCode { get; set; }
