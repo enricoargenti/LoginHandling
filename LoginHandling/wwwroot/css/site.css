@@ -80,35 +80,43 @@ table thead {
 tr {
     width: 20px;
     height: 20px;
+    padding: 20px;
 }
 
 table {
     border-collapse: collapse;
     font-family: Tahoma, Geneva, sans-serif;
+    margin: 0 auto;
 }
 
-table td {
-    padding: 15px;
-}
+    table td {
+        padding: 20px;
+        text-align: center;
+    }
 
-table thead th {
-    text-align: center;
-    background-color: #54585d;
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 13px;
-    border: 1px solid #54585d;
-}
+    table thead th {
+        text-align: center;
+        background-color: #1a659ec1;
+        color: #011627;
+        font-weight: bold;
+        font-size: 18px;
+        padding: 20px;
+    }
 
-table tbody td {
-    color: #636363;
-    border: 1px solid #dddfe1;
-}
+    table tbody td {
+        color: #011627;
+        text-align: center;
+    }
 
-table tbody tr {
-    background-color: #f9fafb;
-}
+    table tbody tr {
+        background-color: #1a659e3f;
+    }
 
-table tbody tr:nth-child(odd) {
-    background-color: #ffffff;
+        table tbody tr:nth-child(odd) {
+            background-color: #1a659e14;
+        }
+
+.center-table {
+    display: flex;
+    justify-content: center;
 }
