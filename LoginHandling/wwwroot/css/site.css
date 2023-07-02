@@ -23,6 +23,7 @@ body {
 }
 
 #userInsertedCode {
+    text-align: center;
     width: 30%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -58,17 +59,14 @@ body {
 }
 
 #randomAckCode {
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 35%;
+    margin: 0 auto;
     padding: 12px 20px;
-    margin: 8px 0;
     box-sizing: border-box;
     outline: none;
-    background-color: rgb(29, 234, 14, 0.50);
+    background-color: #4cec71;
     text-align: center;
-    font-size: large;
-    position: absolute;
+    font-size: 40px;
 }
 
 
@@ -116,7 +114,28 @@ table {
             background-color: #1a659e14;
         }
 
-.center-table {
+
+
+.center-div {
     display: flex;
     justify-content: center;
 }
+
+
+#redirectButton {
+    border-radius: 12px;
+    background-color: white;
+    color: #e76f51;
+    border: 3px solid #e76f51;
+    font-size: 16px;
+    padding: 8px;
+}
+
+    #redirectButton:hover {
+        border-radius: 12px;
+        background-color: #e76f51;
+        color: white;
+        border: 3px solid white;
+        font-size: 16px;
+        padding: 8px;
+    }

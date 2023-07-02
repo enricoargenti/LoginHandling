@@ -1,12 +1,15 @@
 using LoginHandling.Models;
 using LoginHandling.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Data;
 using System.Net.Http.Headers;
 
 namespace LoginHandling.Pages;
 
+[Authorize(Roles = "Admin")]
 public class AccessesViewModel : PageModel
 {
     private readonly ApiProxyService _apiProxyService;
